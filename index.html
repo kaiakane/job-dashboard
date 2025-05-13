@@ -5,111 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap');
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .last-updated {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card .value {
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+    .card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .card ul li {
+      margin-bottom: 0.4rem;
+    }
+    .blue { background-color: #e3f2fd; }
+    .green { background-color: #e8f5e9; }
+    .orange { background-color: #fff3e0; }
+    .purple { background-color: #ede7f6; }
+    .teal { background-color: #e0f7fa; }
+    .pink { background-color: #fce4ec; }
 
-body {
-  margin: 0;
-  font-family: 'Rajdhani', sans-serif;
-  background-color: #0f1117;
-  color: #e0e6ed;
-  padding: 2rem;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-weight: 600;
-  font-size: 2.5rem;
-  color: #00bcd4;
-}
-
-.last-updated {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #9ea7b8;
-  margin-bottom: 2rem;
-}
-
-.dashboard {
-  column-count: 2;
-  column-gap: 1.5rem;
-  padding: 0 1rem;
-  animation: fadeInDashboard 0.6s ease-out forwards;
-}
-
-@media (max-width: 800px) {
-  .dashboard {
-    column-count: 1;
-  }
-}
-
-@keyframes fadeInDashboard {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card {
-  display: inline-block;
-  width: 100%;
-  break-inside: avoid;
-  background: linear-gradient(145deg, #1a1c23, #13151b);
-  border: 1px solid #1f222b;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  margin-bottom: 1.5rem;
-  animation: fadeInCard 0.5s ease both;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-}
-
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: scale(0.97) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-
-.card h2 {
-  margin-top: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #00e5ff;
-}
-
-.card .value {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.card ul li {
-  margin-bottom: 0.4rem;
-  color: #c1c6d4;
-}
+    canvas {
+      width: 100%;
+      height: 300px;
+    }
   </style>
 </head>
 <body>
@@ -117,7 +71,7 @@ h1 {
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
   <div class="dashboard">
     <div class="card blue">
-      <h2>Total Full-Time Applications</h2>
+      <h2>Total Applications</h2>
       <div class="value" id="total-applications">--</div>
     </div>
     <div class="card teal">
@@ -130,11 +84,9 @@ h1 {
         <li>--</li>
       </ul>
     </div>
-    <div class="card orange">
+    <div class="card purple">
       <h2>Applications by Function</h2>
-      <ul id="function-breakdown">
-        <li>--</li>
-      </ul>
+      <canvas id="applications-by-function-chart"></canvas>
     </div>
     <div class="card pink">
       <h2>Applications by Industry</h2>
@@ -142,7 +94,7 @@ h1 {
         <li>--</li>
       </ul>
     </div>
-    <div class="card purple">
+    <div class="card orange">
       <h2>Average Salary by Function</h2>
       <ul id="salary-breakdown">
         <li>--</li>
@@ -156,9 +108,7 @@ h1 {
     </div>
     <div class="card green">
       <h2>Status Breakdown</h2>
-      <ul id="status-breakdown">
-        <li>--</li>
-      </ul>
+      <canvas id="status-breakdown-chart"></canvas>
     </div>
   </div>
 
@@ -192,6 +142,9 @@ h1 {
           ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
           : '<li>None</li>';
 
+        renderApplicationsByFunctionChart(data);
+        renderStatusBreakdownChart(data);
+
         renderList(countBy(data, 'Function'), 'function-breakdown');
         renderList(countBy(data, 'Industry'), 'industry-breakdown');
         renderList(countBy(data, 'Location'), 'location-breakdown');
@@ -213,17 +166,66 @@ h1 {
                 return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
               }).join('')
           : '<li>--</li>';
-
-        const statusCounts = countBy(data, 'Status');
-        const total = data.length;
-        const statusList = document.getElementById('status-breakdown');
-        statusList.innerHTML = Object.entries(statusCounts).length > 0
-          ? Object.entries(statusCounts)
-              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
-              .join('')
-          : '<li>--</li>';
       }
     });
+
+    function renderApplicationsByFunctionChart(data) {
+      const functionCount = countBy(data, 'Function');
+      const labels = Object.keys(functionCount);
+      const values = Object.values(functionCount);
+
+      const ctx = document.getElementById('applications-by-function-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Applications by Function',
+            data: values,
+            backgroundColor: 'rgba(0, 123, 255, 0.6)', // Light blue color
+            borderColor: 'rgba(0, 123, 255, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function renderStatusBreakdownChart(data) {
+      const statusCount = countBy(data, 'Status');
+      const labels = Object.keys(statusCount);
+      const values = Object.values(statusCount);
+
+      const ctx = document.getElementById('status-breakdown-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Status Breakdown',
+            data: values,
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#17a2b8'], // Green, Yellow, Red, Blue
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          }
+        }
+      });
+    }
 
     function countBy(data, key) {
       return data.reduce((acc, row) => {
@@ -246,8 +248,11 @@ h1 {
 
     function renderList(obj, elementId) {
       const el = document.getElementById(elementId);
+      if (!el) return;
       el.innerHTML = Object.entries(obj).length > 0
-        ? Object.entries(obj).map(([label, count]) => `<li>${label}: ${count}</li>`).join('')
+        ? Object.entries(obj)
+            .map(([key, value]) => `<li>${key}: ${value}</li>`)
+            .join('')
         : '<li>--</li>';
     }
   </script>
