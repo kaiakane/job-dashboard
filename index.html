@@ -5,112 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap');
+   <style>
+  :root {
+    --bg-color: #f4f6f9;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --muted-color: #666;
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    --font-family: 'Inter', sans-serif;
+  }
 
-body {
-  margin: 0;
-  font-family: 'Rajdhani', sans-serif;
-  background-color: #0f1117;
-  color: #e0e6ed;
-  padding: 2rem;
-}
+  body.dark {
+    --bg-color: #0e1116;
+    --card-bg: #1a1c23;
+    --text-color: #f0f0f0;
+    --muted-color: #aaa;
+    --card-shadow: rgba(0, 0, 0, 0.4);
+  }
 
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-weight: 600;
-  font-size: 2.5rem;
-  color: #00bcd4;
-}
+  body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 2rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-.last-updated {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #9ea7b8;
-  margin-bottom: 2rem;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+<button class="theme-toggle" onclick="toggleTheme()">Toggle Dark/Light Mode</button>
 
-.dashboard {
-  column-count: 2;
-  column-gap: 1.5rem;
-  padding: 0 1rem;
-  animation: fadeInDashboard 0.6s ease-out forwards;
-}
+  .last-updated {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--muted-color);
+    margin-bottom: 2rem;
+  }
 
-@media (max-width: 800px) {
+  .theme-toggle {
+    display: block;
+    margin: 0 auto 2rem;
+    padding: 0.4rem 1rem;
+    background: none;
+    border: 1px solid var(--muted-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+  }
+
   .dashboard {
-    column-count: 1;
+    column-count: 2;
+    column-gap: 1.5rem;
+    padding: 0 1rem;
+    animation: fadeInDashboard 0.6s ease-out forwards;
   }
-}
 
-@keyframes fadeInDashboard {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @media (max-width: 800px) {
+    .dashboard {
+      column-count: 1;
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fadeInDashboard {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-.card {
-  display: inline-block;
-  width: 100%;
-  break-inside: avoid;
-  background: linear-gradient(145deg, #1a1c23, #13151b);
-  border: 1px solid #1f222b;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  margin-bottom: 1.5rem;
-  animation: fadeInCard 0.5s ease both;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-}
-
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: scale(0.97) translateY(10px);
+  .card {
+    display: inline-block;
+    width: 100%;
+    break-inside: avoid;
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px var(--card-shadow);
+    margin-bottom: 1.5rem;
+    animation: fadeInCard 0.5s ease both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px var(--card-shadow);
   }
-}
 
+  @keyframes fadeInCard {
+    from {
+      opacity: 0;
+      transform: scale(0.97) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
 
-.card h2 {
-  margin-top: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #00e5ff;
-}
+  .card h2 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
 
-.card .value {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #ffffff;
-}
+  .card .value {
+    font-size: 1.75rem;
+    font-weight: 600;
+  }
 
-.card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+  .card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-.card ul li {
-  margin-bottom: 0.4rem;
-  color: #c1c6d4;
-}
-  </style>
+  .card ul li {
+    margin-bottom: 0.4rem;
+  }
+</style>
+  
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
@@ -250,6 +278,19 @@ h1 {
         ? Object.entries(obj).map(([label, count]) => `<li>${label}: ${count}</li>`).join('')
         : '<li>--</li>';
     }
+    function toggleTheme() {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  }
+
+  // Load saved theme
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark');
+    }
+  });
   </script>
+
 </body>
 </html>
