@@ -146,7 +146,7 @@
 
         const salaryMap = {};
         data.forEach(row => {
-          const func = row['Function'];
+          const func = (row['Function'] || '').trim();
           const sal = parseSalary(row['Salary']);
           if (func && func !== '-' && sal) {
             if (!salaryMap[func]) salaryMap[func] = [];
@@ -175,8 +175,8 @@
 
     function countBy(data, key) {
       return data.reduce((acc, row) => {
-        const val = row[key];
-        if (val && val.trim() !== '' && val !== '-') {
+        const val = (row[key] || '').toString().trim();
+        if (val && val !== '-') {
           acc[val] = (acc[val] || 0) + 1;
         }
         return acc;
@@ -190,6 +190,13 @@
         return (cleaned[0] + cleaned[1]) / 2;
       }
       return null;
+    }
+
+    function renderList(obj, elementId) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = Object.entries(obj).length > 0
+        ? Object.entries(obj).map(([label, count]) => `<li>${label}: ${count}</li>`).join('')
+        : '<li>--</li>';
     }
   </script>
 </body>
