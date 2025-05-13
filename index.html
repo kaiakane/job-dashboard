@@ -118,13 +118,12 @@
       download: true,
       header: true,
       complete: function(results) {
-        const data = results.data.filter(row => row['Company']); // Clean blank rows
+        const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
         const now = new Date();
         document.getElementById('last-updated').textContent = now.toLocaleString();
 
         document.getElementById('total-applications').textContent = data.length;
 
-        // Average Response Time
         const responseTimes = data
           .map(row => {
             const applied = new Date(row['Date Applied']);
@@ -135,56 +134,49 @@
         const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
         document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
 
-        // Upcoming Interviews
-        const interviews = data.filter(row => row['Interview Date'] && row['Interview Date'] !== '-');
+        const interviews = data.filter(row => row['Interview Date'] && row['Interview Date'] !== '-' && row['Interview Date'].trim() !== '');
         const interviewList = document.getElementById('interviews-list');
         interviewList.innerHTML = interviews.length > 0
           ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
           : '<li>None</li>';
 
-        // Breakdown by Function
-        const byFunction = countBy(data, 'Function');
-        renderList(byFunction, 'function-breakdown');
+        renderList(countBy(data, 'Function'), 'function-breakdown');
+        renderList(countBy(data, 'Industry'), 'industry-breakdown');
+        renderList(countBy(data, 'Location'), 'location-breakdown');
 
-        // Breakdown by Industry
-        const byIndustry = countBy(data, 'Industry');
-        renderList(byIndustry, 'industry-breakdown');
-
-        // Breakdown by Location
-        const byLocation = countBy(data, 'Location');
-        renderList(byLocation, 'location-breakdown');
-
-        // Salary by Function (averaged)
         const salaryMap = {};
         data.forEach(row => {
           const func = row['Function'];
           const sal = parseSalary(row['Salary']);
-          if (func && sal) {
+          if (func && func !== '-' && sal) {
             if (!salaryMap[func]) salaryMap[func] = [];
             salaryMap[func].push(sal);
           }
         });
         const salaryList = document.getElementById('salary-breakdown');
-        salaryList.innerHTML = Object.entries(salaryMap)
-          .map(([func, sals]) => {
-            const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
-            return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
-          }).join('');
+        salaryList.innerHTML = Object.entries(salaryMap).length > 0
+          ? Object.entries(salaryMap)
+              .map(([func, sals]) => {
+                const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+                return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
+              }).join('')
+          : '<li>--</li>';
 
-        // Status Breakdown
         const statusCounts = countBy(data, 'Status');
         const total = data.length;
         const statusList = document.getElementById('status-breakdown');
-        statusList.innerHTML = Object.entries(statusCounts)
-          .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
-          .join('');
+        statusList.innerHTML = Object.entries(statusCounts).length > 0
+          ? Object.entries(statusCounts)
+              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
+              .join('')
+          : '<li>--</li>';
       }
     });
 
     function countBy(data, key) {
       return data.reduce((acc, row) => {
         const val = row[key];
-        if (val && val !== '-') {
+        if (val && val.trim() !== '' && val !== '-') {
           acc[val] = (acc[val] || 0) + 1;
         }
         return acc;
@@ -192,10 +184,10 @@
     }
 
     function parseSalary(salary) {
-      if (!salary || salary.includes('-') === false) return null;
-      const parts = salary.replace(/[$,]/g, '').split('-').map(Number);
-      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        return (parts[0] + parts[1]) / 2;
+      if (!salary || typeof salary !== 'string') return null;
+      const cleaned = salary.replace(/[$,]/g, '').split('-').map(s => parseFloat(s.trim()));
+      if (cleaned.length === 2 && !isNaN(cleaned[0]) && !isNaN(cleaned[1])) {
+        return (cleaned[0] + cleaned[1]) / 2;
       }
       return null;
     }
