@@ -31,14 +31,13 @@
       margin-bottom: 2rem;
     }
 
-    .dashboard {
-  display: flex;
-  flex-wrap: wrap;
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-auto-rows: 10px;
   gap: 1.5rem;
-  justify-content: flex-start;
   padding: 0 1rem;
   animation: fadeInDashboard 0.6s ease-out forwards;
-  align-items: flex-start;
 }
 
     @media (max-width: 800px) {
@@ -58,7 +57,7 @@
       }
     }
 
-    .card {
+   .card {
   background: linear-gradient(145deg, #1a1c23, #13151b);
   border: 1px solid #1f222b;
   border-radius: 16px;
@@ -66,9 +65,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   animation: fadeInCard 0.5s ease both;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: inline-block;
-  max-width: 100%;
-  width: auto;
+  break-inside: avoid;
 }
 
     .card:hover {
