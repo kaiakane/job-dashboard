@@ -31,9 +31,8 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Makes the cards responsive */
-      grid-gap: 1.5rem; /* Space between the cards */
-      padding: 0 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Auto-fill with flexible column sizes */
+      gap: 1.5rem; /* Space between the boxes */
     }
 
     .card {
@@ -44,7 +43,7 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       animation: fadeInCard 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      break-inside: avoid; /* Ensures cards do not break across columns */
+      break-inside: avoid; /* Prevents breaking across columns */
     }
 
     .card h2 {
@@ -82,12 +81,13 @@
         transform: scale(1) translateY(0);
       }
     }
+
   </style>
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
-  <div class="dashboard">
+  <div class="dashboard" id="dashboard">
     <div class="card blue">
       <h2>Total Full-Time Applications</h2>
       <div class="value" id="total-applications">--</div>
@@ -136,6 +136,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
+    // Your existing code for parsing and populating data
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
 
     Papa.parse(sheetUrl, {
@@ -202,8 +203,34 @@
               .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
               .join('')
           : '<li>--</li>';
+
+        // Call the masonry layout function after the content is populated
+        layoutMasonry();
       }
     });
+
+    // Masonry layout function
+    function layoutMasonry() {
+      const dashboard = document.getElementById('dashboard');
+      const cards = Array.from(dashboard.children);
+      const columnCount = 3; // You can adjust this value for the number of columns you want
+
+      const columnHeights = Array(columnCount).fill(0);
+
+      cards.forEach(card => {
+        // Find the shortest column
+        const minColumnHeight = Math.min(...columnHeights);
+        const minColumnIndex = columnHeights.indexOf(minColumnHeight);
+
+        // Place the card in the shortest column
+        card.style.position = 'absolute';
+        card.style.top = `${minColumnHeight}px`;
+        card.style.left = `${minColumnIndex * (card.offsetWidth + 15)}px`;
+
+        // Update the column height
+        columnHeights[minColumnIndex] += card.offsetHeight + 15;
+      });
+    }
 
     function countBy(data, key) {
       return data.reduce((acc, row) => {
