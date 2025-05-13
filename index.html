@@ -2,54 +2,203 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Application Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: sans-serif;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
       padding: 2rem;
-      background-color: #f9f9f9;
     }
     h1 {
-      color: #333;
+      text-align: center;
+      margin-bottom: 2rem;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 1rem;
+    .last-updated {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 2rem;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
-    th {
-      background-color: #eee;
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card .value {
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+    .card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .card ul li {
+      margin-bottom: 0.4rem;
+    }
+    .blue { background-color: #e3f2fd; }
+    .green { background-color: #e8f5e9; }
+    .orange { background-color: #fff3e0; }
+    .purple { background-color: #ede7f6; }
+    .teal { background-color: #e0f7fa; }
+    .pink { background-color: #fce4ec; }
   </style>
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Role</th>
-        <th>Date Applied</th>
-        <th>Status</th>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Example Corp</td>
-        <td>Marketing Manager</td>
-        <td>2025-05-01</td>
-        <td>Interviewing</td>
-        <td>Follow-up sent</td>
-      </tr>
-      <!-- Add more rows here -->
-    </tbody>
-  </table>
+  <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
+  <div class="dashboard">
+    <div class="card blue">
+      <h2>Total Applications</h2>
+      <div class="value" id="total-applications">--</div>
+    </div>
+    <div class="card teal">
+      <h2>Average Response Time</h2>
+      <div class="value" id="avg-response">--</div>
+    </div>
+    <div class="card green">
+      <h2>Upcoming Interviews</h2>
+      <ul id="interviews-list">
+        <li>--</li>
+      </ul>
+    </div>
+    <div class="card orange">
+      <h2>Applications by Function</h2>
+      <ul id="function-breakdown">
+        <li>--</li>
+      </ul>
+    </div>
+    <div class="card pink">
+      <h2>Applications by Industry</h2>
+      <ul id="industry-breakdown">
+        <li>--</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h2>Average Salary by Function</h2>
+      <ul id="salary-breakdown">
+        <li>--</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h2>Applications by Location</h2>
+      <ul id="location-breakdown">
+        <li>--</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h2>Status Breakdown</h2>
+      <ul id="status-breakdown">
+        <li>--</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
+
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data.filter(row => row['Company']); // Clean blank rows
+        const now = new Date();
+        document.getElementById('last-updated').textContent = now.toLocaleString();
+
+        document.getElementById('total-applications').textContent = data.length;
+
+        // Average Response Time
+        const responseTimes = data
+          .map(row => {
+            const applied = new Date(row['Date Applied']);
+            const responded = new Date(row['Response Date']);
+            return (!isNaN(applied) && !isNaN(responded)) ? (responded - applied) / (1000 * 60 * 60 * 24) : null;
+          })
+          .filter(days => days !== null);
+        const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+        document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
+
+        // Upcoming Interviews
+        const interviews = data.filter(row => row['Interview Date'] && row['Interview Date'] !== '-');
+        const interviewList = document.getElementById('interviews-list');
+        interviewList.innerHTML = interviews.length > 0
+          ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
+          : '<li>None</li>';
+
+        // Breakdown by Function
+        const byFunction = countBy(data, 'Function');
+        renderList(byFunction, 'function-breakdown');
+
+        // Breakdown by Industry
+        const byIndustry = countBy(data, 'Industry');
+        renderList(byIndustry, 'industry-breakdown');
+
+        // Breakdown by Location
+        const byLocation = countBy(data, 'Location');
+        renderList(byLocation, 'location-breakdown');
+
+        // Salary by Function (averaged)
+        const salaryMap = {};
+        data.forEach(row => {
+          const func = row['Function'];
+          const sal = parseSalary(row['Salary']);
+          if (func && sal) {
+            if (!salaryMap[func]) salaryMap[func] = [];
+            salaryMap[func].push(sal);
+          }
+        });
+        const salaryList = document.getElementById('salary-breakdown');
+        salaryList.innerHTML = Object.entries(salaryMap)
+          .map(([func, sals]) => {
+            const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+            return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
+          }).join('');
+
+        // Status Breakdown
+        const statusCounts = countBy(data, 'Status');
+        const total = data.length;
+        const statusList = document.getElementById('status-breakdown');
+        statusList.innerHTML = Object.entries(statusCounts)
+          .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
+          .join('');
+      }
+    });
+
+    function countBy(data, key) {
+      return data.reduce((acc, row) => {
+        const val = row[key];
+        if (val && val !== '-') {
+          acc[val] = (acc[val] || 0) + 1;
+        }
+        return acc;
+      }, {});
+    }
+
+    function parseSalary(salary) {
+      if (!salary || salary.includes('-') === false) return null;
+      const parts = salary.replace(/[$,]/g, '').split('-').map(Number);
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return (parts[0] + parts[1]) / 2;
+      }
+      return null;
+    }
+  </script>
 </body>
 </html>
