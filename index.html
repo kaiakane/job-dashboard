@@ -30,17 +30,15 @@
     }
 
     .dashboard {
+      column-count: 3; /* Number of columns in the masonry layout */
+      column-gap: 1.5rem; /* Space between columns */
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
       padding: 0 1rem;
-      grid-auto-rows: 1fr; /* Ensures all items take the same available space */
-      animation: fadeInDashboard 0.6s ease-out forwards;
     }
 
     @media (max-width: 800px) {
       .dashboard {
-        grid-template-columns: 1fr;
+        column-count: 1; /* Stack into a single column on smaller screens */
       }
     }
 
@@ -52,11 +50,8 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       animation: fadeInCard 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      break-inside: avoid;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
+      break-inside: avoid-column; /* Ensures cards don't break across columns */
+      margin-bottom: 1.5rem;
     }
 
     .card h2 {
@@ -77,24 +72,11 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      flex-grow: 1;
-      overflow-y: auto; /* Prevents overflow within the card */
     }
 
     .card ul li {
       margin-bottom: 0.4rem;
       color: #c1c6d4;
-    }
-
-    @keyframes fadeInDashboard {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     @keyframes fadeInCard {
