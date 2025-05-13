@@ -6,58 +6,74 @@
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f4f6f9;
-      color: #333;
-      padding: 2rem;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .last-updated {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 2rem;
-    }
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-    .card {
-      background-color: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-    .card h2 {
-      margin-top: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .card .value {
-      font-size: 1.75rem;
-      font-weight: 600;
-    }
-    .card ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .card ul li {
-      margin-bottom: 0.4rem;
-    }
-    .blue { background-color: #e3f2fd; }
-    .green { background-color: #e8f5e9; }
-    .orange { background-color: #fff3e0; }
-    .purple { background-color: #ede7f6; }
-    .teal { background-color: #e0f7fa; }
-    .pink { background-color: #fce4ec; }
+   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  background-color: #0f1117;
+  color: #e0e6ed;
+  padding: 2rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  font-size: 2.5rem;
+  color: #00bcd4;
+}
+
+.last-updated {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #9ea7b8;
+  margin-bottom: 2rem;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: linear-gradient(145deg, #1a1c23, #13151b);
+  border: 1px solid #1f222b;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #00e5ff;
+}
+
+.card .value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card ul li {
+  margin-bottom: 0.4rem;
+  color: #c1c6d4;
+}
   </style>
 </head>
 <body>
