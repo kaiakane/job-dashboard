@@ -30,16 +30,10 @@
     }
 
     .dashboard {
-      column-count: 3; /* Number of columns in the masonry layout */
-      column-gap: 1.5rem; /* Space between columns */
       display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Makes the cards responsive */
+      grid-gap: 1.5rem; /* Space between the cards */
       padding: 0 1rem;
-    }
-
-    @media (max-width: 800px) {
-      .dashboard {
-        column-count: 1; /* Stack into a single column on smaller screens */
-      }
     }
 
     .card {
@@ -50,8 +44,7 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       animation: fadeInCard 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      break-inside: avoid-column; /* Ensures cards don't break across columns */
-      margin-bottom: 1.5rem;
+      break-inside: avoid; /* Ensures cards do not break across columns */
     }
 
     .card h2 {
