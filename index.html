@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <style>
     body {
@@ -14,21 +15,6 @@
       background-color: #f78d5f;
       color: #000;
       padding: 2rem;
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(120deg, rgba(255,255,255,0.04), rgba(0,0,0,0.03));
-      animation: backgroundMove 10s linear infinite;
-      z-index: 0;
-    }
-
-    @keyframes backgroundMove {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
     }
 
     h1 {
@@ -70,21 +56,6 @@
       box-sizing: border-box;
       font-size: 1.2rem;
       box-shadow: 4px 4px 0px #000;
-      opacity: 0;
-      animation: fadeIn 0.5s ease-in forwards;
-      animation-delay: calc(var(--order, 0) * 0.1s);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 6px 6px 0px #000;
     }
 
     .card-header {
@@ -116,81 +87,56 @@
     ul {
       padding-left: 1rem;
     }
+.title-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
 
-    .title-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2rem;
-    }
+.title-box {
+  background-color: #fef1ea;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  width: 45%;
+  min-height: 200px; /* or adjust as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
 
-    .title-box {
-      background-color: #fef1ea;
-      border: 2px solid #000;
-      box-shadow: 4px 4px 0px #000;
-      width: 45%;
-      min-height: 200px; /* or adjust as needed */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-sizing: border-box;
-    }
+.title-text {
+   font-family: 'Press Start 2P', monospace;
+  font-size: 2.8rem;
+  font-weight: bold;
+  line-height: 1.35;
+  color: #222288; /* same blue as your card headers */
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .title-box {
+    width: 90%;
+    min-height: 120px;
+    padding: 1rem;
+  }
 
-    .title-text {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 2.8rem;
-      font-weight: bold;
-      line-height: 1.35;
-      color: #222288; /* same blue as your card headers */
-      margin: 0;
-    }
+  .title-text {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+}
 
-    .title-text img {
-      width: 1.5rem;
-      vertical-align: middle;
-      margin-right: 0.5rem;
-    }
-
-    @media (max-width: 600px) {
-      .title-box {
-        width: 90%;
-        min-height: 120px;
-        padding: 1rem;
-      }
-
-      .title-text {
-        font-size: 1.4rem;
-        text-align: center;
-      }
-    }
-
-    hr.pixel-divider {
-      border: 0;
-      height: 4px;
-      background: repeating-linear-gradient(
-        45deg,
-        #222288,
-        #222288 4px,
-        #fef1ea 4px,
-        #fef1ea 8px
-      );
-      margin: 1rem 0;
-    }
-
-    body {
-      cursor: url('https://cdn.custom-cursor.com/db/cursor/32/pixel_cursor.png'), auto;
-    }
 
   </style>
 </head>
 <body>
-  <div class="title-container">
-    <div class="title-box">
-      <h1 class="title-text">
-        <img src="https://emojicdn.elk.sh/💾" alt="Floppy Disk">
-        Job Application Dashboard
-      </h1>
-    </div>
+ <div class="title-container">
+  <div class="title-box">
+    <h1 class="title-text">Job Application Dashboard</h1>
   </div>
+</div>
+
+
 
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
 
@@ -248,37 +194,62 @@
 
         const salaryMap = {};
         data.forEach(row => {
-          if (row['Salary']) {
-            const salary = parseInt(row['Salary'].replace(/[^0-9.-]+/g, ''), 10);
-            if (salary) {
-              salaryMap[row['Function']] = salaryMap[row['Function']] || [];
-              salaryMap[row['Function']].push(salary);
-            }
+          const func = (row['Function'] || '').trim();
+          const sal = parseSalary(row['Salary']);
+          if (func && func !== '-' && sal) {
+            if (!salaryMap[func]) salaryMap[func] = [];
+            salaryMap[func].push(sal);
           }
         });
-        const salaryBreakdown = document.getElementById('salary-breakdown');
-        salaryBreakdown.innerHTML = Object.entries(salaryMap).map(([functionName, salaries]) => {
-          const avgSalary = (salaries.reduce((sum, s) => sum + s, 0) / salaries.length).toFixed(2);
-          return `<li>${functionName}: $${avgSalary}</li>`;
-        }).join('');
+        const salaryList = document.getElementById('salary-breakdown');
+      salaryList.innerHTML = Object.entries(salaryMap).length > 0
+  ? Object.entries(salaryMap)
+      .map(([func, sals]) => {
+        const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+        return { func, avg };
+      })
+      .sort((a, b) => b.avg - a.avg)
+      .map(({ func, avg }) => `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`)
+      .join('')
+  : '<li>--</li>';
 
-        const statusBreakdown = countBy(data, 'Status');
-        renderList(statusBreakdown, 'status-breakdown');
+        const statusCounts = countBy(data, 'Status');
+        const total = data.length;
+        const statusList = document.getElementById('status-breakdown');
+        statusList.innerHTML = Object.entries(statusCounts).length > 0
+          ? Object.entries(statusCounts)
+              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
+              .join('')
+          : '<li>--</li>';
       }
     });
 
     function countBy(data, key) {
       return data.reduce((acc, row) => {
-        const value = row[key] || 'Unknown';
-        acc[value] = (acc[value] || 0) + 1;
+        const val = (row[key] || '').toString().trim();
+        if (val && val !== '-') {
+          acc[val] = (acc[val] || 0) + 1;
+        }
         return acc;
       }, {});
     }
 
-    function renderList(data, id) {
-      const container = document.getElementById(id);
-      container.innerHTML = Object.entries(data).map(([key, count]) => `<li>${key}: ${count}</li>`).join('');
+    function parseSalary(salary) {
+      if (!salary || typeof salary !== 'string') return null;
+      const cleaned = salary.replace(/[$,]/g, '').split('-').map(s => parseFloat(s.trim()));
+      if (cleaned.length === 2 && !isNaN(cleaned[0]) && !isNaN(cleaned[1])) {
+        return (cleaned[0] + cleaned[1]) / 2;
+      }
+      return null;
     }
+
+    function renderList(obj, elementId) {
+  const el = document.getElementById(elementId);
+  el.innerHTML = Object.entries(obj)
+    .sort((a, b) => b[1] - a[1]) // Sort descending by count/value
+    .map(([key, value]) => `<li>${key}: ${value}</li>`)
+    .join('');
+}
   </script>
 </body>
 </html>
