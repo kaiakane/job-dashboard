@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Application Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -17,16 +15,10 @@
     }
 
     h1 {
-      font-family: 'Press Start 2P', cursive;
       text-align: center;
-      font-size: 3.5rem;
+      font-size: 2.7rem; /* Adjusted size */
       margin-bottom: 1rem;
-      color: #fff;
-      padding: 1rem;
-      border: 2px solid #000; /* Matching style of other cards */
-      background-color: #fef1ea; /* Light background similar to the cards */
-      box-shadow: 4px 4px 0px #000; /* Adding box shadow like the cards */
-      border-radius: 10px;
+      color: #222288; /* Blue color matching the boxes */
     }
 
     .last-updated {
@@ -91,6 +83,7 @@
     ul {
       padding-left: 1rem;
     }
+
   </style>
 </head>
 <body>
@@ -108,44 +101,101 @@
     <div class="card"><div class="card-header"><span>Status Breakdown</span><span class="close-button"></span></div><div class="card-content"><ul id="status-breakdown"><li>--</li></ul></div></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    document.getElementById('last-updated').textContent = new Date().toLocaleString();
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
 
-    window.onload = function () {
-      Papa.parse('https://docs.google.com/spreadsheets/d/1nC8DMkTufScBvOpK4r1Adw6NY54G320IB2Z/gviz/tq?tqx=out:csv', {
-        download: true,
-        header: true,
-        complete: function(results) {
-          // Populating the data into the dashboard
-          document.getElementById('total-applications').textContent = results.data[0]['Total Applications'];
-          document.getElementById('avg-response').textContent = results.data[0]['Average Response Time'];
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
+        const now = new Date();
+        document.getElementById('last-updated').textContent = now.toLocaleString();
 
-          const listIDs = {
-            'interviews-list': 'Upcoming Interviews',
-            'function-breakdown': 'Applications by Function',
-            'industry-breakdown': 'Applications by Industry',
-            'salary-breakdown': 'Average Salary by Function',
-            'location-breakdown': 'Applications by Location',
-            'status-breakdown': 'Status Breakdown',
-          };
+        document.getElementById('total-applications').textContent = data.length;
 
-          for (let id in listIDs) {
-            const raw = results.data[0][listIDs[id]];
-            const list = document.getElementById(id);
-            list.innerHTML = '';
-            if (raw) {
-              raw.split(';').forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item.trim();
-                list.appendChild(li);
-              });
-            } else {
-              list.innerHTML = '<li>--</li>';
-            }
+        const responseTimes = data
+          .map(row => {
+            const applied = new Date(row['Date Applied']);
+            const responded = new Date(row['Response Date']);
+            return (!isNaN(applied) && !isNaN(responded)) ? (responded - applied) / (1000 * 60 * 60 * 24) : null;
+          })
+          .filter(days => days !== null);
+        const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+        document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const interviews = data.filter(row => {
+          const dateStr = row['Interview Date'];
+          if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
+          const interviewDate = new Date(dateStr);
+          return interviewDate >= today;
+        });
+        const interviewList = document.getElementById('interviews-list');
+        interviewList.innerHTML = interviews.length > 0
+          ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
+          : '<li>None</li>';
+
+        renderList(countBy(data, 'Function'), 'function-breakdown');
+        renderList(countBy(data, 'Industry'), 'industry-breakdown');
+        renderList(countBy(data, 'Location'), 'location-breakdown');
+
+        const salaryMap = {};
+        data.forEach(row => {
+          const func = (row['Function'] || '').trim();
+          const sal = parseSalary(row['Salary']);
+          if (func && func !== '-' && sal) {
+            if (!salaryMap[func]) salaryMap[func] = [];
+            salaryMap[func].push(sal);
           }
+        });
+        const salaryList = document.getElementById('salary-breakdown');
+        salaryList.innerHTML = Object.entries(salaryMap).length > 0
+          ? Object.entries(salaryMap)
+              .map(([func, sals]) => {
+                const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+                return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
+              }).join('')
+          : '<li>--</li>';
+
+        const statusCounts = countBy(data, 'Status');
+        const total = data.length;
+        const statusList = document.getElementById('status-breakdown');
+        statusList.innerHTML = Object.entries(statusCounts).length > 0
+          ? Object.entries(statusCounts)
+              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
+              .join('')
+          : '<li>--</li>';
+      }
+    });
+
+    function countBy(data, key) {
+      return data.reduce((acc, row) => {
+        const val = (row[key] || '').toString().trim();
+        if (val && val !== '-') {
+          acc[val] = (acc[val] || 0) + 1;
         }
-      });
-    };
+        return acc;
+      }, {});
+    }
+
+    function parseSalary(salary) {
+      if (!salary || typeof salary !== 'string') return null;
+      const cleaned = salary.replace(/[$,]/g, '').split('-').map(s => parseFloat(s.trim()));
+      if (cleaned.length === 2 && !isNaN(cleaned[0]) && !isNaN(cleaned[1])) {
+        return (cleaned[0] + cleaned[1]) / 2;
+      }
+      return null;
+    }
+
+    function renderList(obj, elementId) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = Object.entries(obj)
+        .map(([key, value]) => `<li>${key}: ${value}</li>`)
+        .join('');
+    }
   </script>
 </body>
 </html>
