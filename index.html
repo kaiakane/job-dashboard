@@ -56,8 +56,14 @@
       box-sizing: border-box;
       font-size: 1.2rem;
       box-shadow: 4px 4px 0px #000;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
     }
-
+.card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 6px 6px 0px #000;
+}
+    
     .card-header {
       background-color: #222288;
       color: #fff;
