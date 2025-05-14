@@ -2,202 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'VT323', monospace;
-      background-color: #f27052;
-      color: #1e1e1e;
+      background-color: #f78d5f;
+      color: #000;
       padding: 2rem;
     }
 
     h1 {
       text-align: center;
       font-size: 3rem;
-      color: #ffffff;
       margin-bottom: 1rem;
+      color: #1f1f1f;
     }
 
     .last-updated {
       text-align: center;
       font-size: 1.2rem;
-      color: #ffe;
       margin-bottom: 2rem;
     }
 
     .dashboard {
-      column-count: 2;
-      column-gap: 1.5rem;
+      column-count: 3;
+      column-gap: 1rem;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 1000px) {
+      .dashboard {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 600px) {
       .dashboard {
         column-count: 1;
       }
     }
 
     .card {
-      display: inline-block;
-      width: 100%;
       background-color: #fff;
-      color: #000;
-      border: 2px solid #333;
-      border-radius: 4px;
-      padding: 1rem;
-      margin: 0 0 1.5rem;
-      box-shadow: 4px 4px 0 #000;
-      position: relative;
-    }
-
-    .card::before {
-      content: "🖥️";
-      position: absolute;
-      top: -1.2rem;
-      left: 0.5rem;
-      font-size: 1.5rem;
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-      color: #0f1a2c;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .value {
-      font-size: 2rem;
-      color: #222;
-      font-weight: bold;
-    }
-
-    .card ul {
-      list-style: square;
-      padding-left: 1.5rem;
-      margin: 0;
-    }
-
-    .card ul li {
-      margin-bottom: 0.3rem;
-      color: #333;
+      display: inline-block;
+      margin: 0 0 1rem;
+      border: 2px solid #000;
+      width: 100%;
+      box-sizing: border-box;
       font-size: 1.2rem;
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    .card-header {
+      background-color: #004d99;
+      color: #fff;
+      padding: 0.4rem 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header span {
+      font-size: 1.4rem;
+    }
+
+    .close-button {
+      background-color: #ff4c4c;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    ul {
+      padding-left: 1rem;
+    }
+
+    /* Decorative icons */
+    .decorations {
+      position: absolute;
+      z-index: 0;
+      opacity: 0.3;
+    }
+
+    .decor-top-left {
+      top: 10px;
+      left: 10px;
+      width: 40px;
+    }
+
+    .decor-top-right {
+      top: 10px;
+      right: 10px;
+      width: 40px;
+    }
+
+    .decor-bottom-left {
+      bottom: 10px;
+      left: 10px;
+      width: 40px;
+    }
+
+    .decor-bottom-right {
+      bottom: 10px;
+      right: 10px;
+      width: 40px;
+    }
+
+    .decorations img {
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
-  <div class="dashboard">
-    <div class="card"><h2>📄 Total Applications</h2><div class="value" id="total-applications">--</div></div>
-    <div class="card"><h2>⏱️ Avg Response Time</h2><div class="value" id="avg-response">--</div></div>
-    <div class="card"><h2>🎤 Upcoming Interviews</h2><ul id="interviews-list"><li>--</li></ul></div>
-    <div class="card"><h2>📁 By Function</h2><ul id="function-breakdown"><li>--</li></ul></div>
-    <div class="card"><h2>🏭 By Industry</h2><ul id="industry-breakdown"><li>--</li></ul></div>
-    <div class="card"><h2>💰 Avg Salary by Function</h2><ul id="salary-breakdown"><li>--</li></ul></div>
-    <div class="card"><h2>📍 By Location</h2><ul id="location-breakdown"><li>--</li></ul></div>
-    <div class="card"><h2>📊 Status Breakdown</h2><ul id="status-breakdown"><li>--</li></ul></div>
+
+  <!-- Decorative Icons -->
+  <div class="decorations decor-top-left">
+    <img src="https://img.icons8.com/?size=100&id=53542&format=png" alt="icon">
+  </div>
+  <div class="decorations decor-top-right">
+    <img src="https://img.icons8.com/?size=100&id=1jaSVayFGeGq&format=png" alt="icon">
+  </div>
+  <div class="decorations decor-bottom-left">
+    <img src="https://img.icons8.com/?size=100&id=1Z8Py0OEzFLU&format=png" alt="icon">
+  </div>
+  <div class="decorations decor-bottom-right">
+    <img src="https://img.icons8.com/?size=100&id=dlvGJnhfZJ8V&format=png" alt="icon">
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <div class="dashboard">
+    <div class="card">
+      <div class="card-header"><span>Total Full-Time Applications</span><span class="close-button"></span></div>
+      <div class="card-content"><div id="total-applications">--</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Average Response Time</span><span class="close-button"></span></div>
+      <div class="card-content"><div id="avg-response">--</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Upcoming Interviews</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="interviews-list"><li>--</li></ul></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Applications by Function</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="function-breakdown"><li>--</li></ul></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Applications by Industry</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="industry-breakdown"><li>--</li></ul></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Average Salary by Function</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="salary-breakdown"><li>--</li></ul></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Applications by Location</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="location-breakdown"><li>--</li></ul></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span>Status Breakdown</span><span class="close-button"></span></div>
+      <div class="card-content"><ul id="status-breakdown"><li>--</li></ul></div>
+    </div>
+  </div>
+
   <script>
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
-
-    Papa.parse(sheetUrl, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
-        const now = new Date();
-        document.getElementById('last-updated').textContent = now.toLocaleString();
-
-        document.getElementById('total-applications').textContent = data.length;
-
-        const responseTimes = data
-          .map(row => {
-            const applied = new Date(row['Date Applied']);
-            const responded = new Date(row['Response Date']);
-            return (!isNaN(applied) && !isNaN(responded)) ? (responded - applied) / (1000 * 60 * 60 * 24) : null;
-          })
-          .filter(days => days !== null);
-        const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
-        document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const interviews = data.filter(row => {
-          const dateStr = row['Interview Date'];
-          if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
-          const interviewDate = new Date(dateStr);
-          return interviewDate >= today;
-        });
-        const interviewList = document.getElementById('interviews-list');
-        interviewList.innerHTML = interviews.length > 0
-          ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
-          : '<li>None</li>';
-
-        renderList(countBy(data, 'Function'), 'function-breakdown');
-        renderList(countBy(data, 'Industry'), 'industry-breakdown');
-        renderList(countBy(data, 'Location'), 'location-breakdown');
-
-        const salaryMap = {};
-        data.forEach(row => {
-          const func = (row['Function'] || '').trim();
-          const sal = parseSalary(row['Salary']);
-          if (func && func !== '-' && sal) {
-            if (!salaryMap[func]) salaryMap[func] = [];
-            salaryMap[func].push(sal);
-          }
-        });
-        const salaryList = document.getElementById('salary-breakdown');
-        salaryList.innerHTML = Object.entries(salaryMap).length > 0
-          ? Object.entries(salaryMap)
-              .map(([func, sals]) => {
-                const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
-                return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
-              }).join('')
-          : '<li>--</li>';
-
-        const statusCounts = countBy(data, 'Status');
-        const total = data.length;
-        const statusList = document.getElementById('status-breakdown');
-        statusList.innerHTML = Object.entries(statusCounts).length > 0
-          ? Object.entries(statusCounts)
-              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
-              .join('')
-          : '<li>--</li>';
-      }
-    });
-
-    function countBy(data, key) {
-      return data.reduce((acc, row) => {
-        const val = (row[key] || '').toString().trim();
-        if (val && val !== '-') {
-          acc[val] = (acc[val] || 0) + 1;
-        }
-        return acc;
-      }, {});
-    }
-
-    function parseSalary(salary) {
-      if (!salary || typeof salary !== 'string') return null;
-      const cleaned = salary.replace(/[$,]/g, '').split('-').map(s => parseFloat(s.trim()));
-      if (cleaned.length === 2 && !isNaN(cleaned[0]) && !isNaN(cleaned[1])) {
-        return (cleaned[0] + cleaned[1]) / 2;
-      }
-      return null;
-    }
-
-    function renderList(obj, elementId) {
-      const el = document.getElementById(elementId);
-      el.innerHTML = Object.entries(obj).length > 0
-        ? Object.entries(obj).map(([label, count]) => `<li>${label}: ${count}</li>`).join('')
-        : '<li>--</li>';
-    }
+    document.getElementById('last-updated').textContent = new Date().toLocaleString();
   </script>
 </body>
 </html>
