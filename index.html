@@ -83,31 +83,33 @@
     ul {
       padding-left: 1rem;
     }
-.title-card {
-  margin: 0 auto 2rem auto;
-  max-width: 600px;
-  text-align: center;
+.title-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
-.title-card .card-header {
-  background-color: #fef1ea;
-  color: #222288; /* same blue as the other card titles */
-  font-size: 3rem; /* slightly smaller than before */
-  justify-content: center;
-  padding: 1rem;
-  border: 2px solid #000;
-  box-shadow: 4px 4px 0px #000;
+.title-box {
+  max-width: fit-content;
+}
+
+.title-text {
+  font-size: 4.5rem; /* Adjust as needed */
+  font-weight: bold;
+  color: #222288;
 }
 
   </style>
 </head>
 <body>
-  <div class="card title-card">
-  <div class="card-header">
-    <span>Job Application Dashboard</span>
-    <span class="close-button"></span>
+  <div class="title-container">
+  <div class="card title-box">
+    <div class="card-header">
+      <span class="title-text">Job Application Dashboard</span>
+    </div>
   </div>
 </div>
+
 
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
 
