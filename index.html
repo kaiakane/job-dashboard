@@ -93,37 +93,31 @@
   background-color: #fef1ea;
   border: 2px solid #000;
   box-shadow: 4px 4px 0px #000;
-  width: 33%;
-  min-height: 120px; /* adjust this value as needed */
+  width: 45%;
+  min-height: 240px; /* or adjust as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   box-sizing: border-box;
 }
 
-.card-header {
-  background-color: #222288;
-  color: #fff;
-  padding: 0.4rem 0.7rem;
-  display: flex;
-  justify-content: center; /* center text */
-  align-items: center;
-}
-
 .title-text {
-  font-size: 3.5rem; /* slightly smaller than before */
+  font-size: 3.5rem;
   font-weight: bold;
-  color: #fff; /* text is inside blue header, keep it white */
+  color: #222288; /* same blue as your card headers */
+  margin: 0;
 }
 
 
   </style>
 </head>
 <body>
-  <div class="title-container">
-  <div class="card title-box">
-    <div class="card-header">
-      <span class="title-text">Job Application Dashboard</span>
-    </div>
+ <div class="title-container">
+  <div class="title-box">
+    <h1 class="title-text">Job Application Dashboard</h1>
   </div>
 </div>
+
 
 
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
