@@ -201,13 +201,16 @@
           }
         });
         const salaryList = document.getElementById('salary-breakdown');
-        salaryList.innerHTML = Object.entries(salaryMap).length > 0
-          ? Object.entries(salaryMap)
-              .map(([func, sals]) => {
-                const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
-                return `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`;
-              }).join('')
-          : '<li>--</li>';
+      salaryList.innerHTML = Object.entries(salaryMap).length > 0
+  ? Object.entries(salaryMap)
+      .map(([func, sals]) => {
+        const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+        return { func, avg };
+      })
+      .sort((a, b) => b.avg - a.avg)
+      .map(({ func, avg }) => `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`)
+      .join('')
+  : '<li>--</li>';
 
         const statusCounts = countBy(data, 'Status');
         const total = data.length;
@@ -240,11 +243,12 @@
     }
 
     function renderList(obj, elementId) {
-      const el = document.getElementById(elementId);
-      el.innerHTML = Object.entries(obj)
-        .map(([key, value]) => `<li>${key}: ${value}</li>`)
-        .join('');
-    }
+  const el = document.getElementById(elementId);
+  el.innerHTML = Object.entries(obj)
+    .sort((a, b) => b[1] - a[1]) // Sort descending by count/value
+    .map(([key, value]) => `<li>${key}: ${value}</li>`)
+    .join('');
+}
   </script>
 </body>
 </html>
