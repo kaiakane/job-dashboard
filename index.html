@@ -2,145 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Application Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0f1117;
-      color: #e0e6ed;
+      font-family: 'VT323', monospace;
+      background-color: #f27052;
+      color: #1e1e1e;
       padding: 2rem;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 2rem;
-      font-size: 2.5rem;
-      color: #00bcd4;
+      font-size: 3rem;
+      color: #ffffff;
+      margin-bottom: 1rem;
     }
 
     .last-updated {
       text-align: center;
-      font-size: 0.9rem;
-      color: #9ea7b8;
+      font-size: 1.2rem;
+      color: #ffe;
       margin-bottom: 2rem;
     }
 
     .dashboard {
-      column-count: 3;
+      column-count: 2;
       column-gap: 1.5rem;
     }
 
-    @media (max-width: 1000px) {
-      .dashboard {
-        column-count: 2;
-      }
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 800px) {
       .dashboard {
         column-count: 1;
       }
     }
 
     .card {
-      background: linear-gradient(145deg, #1a1c23, #13151b);
-      border: 1px solid #1f222b;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      break-inside: avoid;
-      animation: fadeInCard 0.5s ease both;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-block;
+      width: 100%;
+      background-color: #fff;
+      color: #000;
+      border: 2px solid #333;
+      border-radius: 4px;
+      padding: 1rem;
+      margin: 0 0 1.5rem;
+      box-shadow: 4px 4px 0 #000;
+      position: relative;
+    }
+
+    .card::before {
+      content: "🖥️";
+      position: absolute;
+      top: -1.2rem;
+      left: 0.5rem;
+      font-size: 1.5rem;
     }
 
     .card h2 {
-      font-size: 1rem;
-      font-weight: 600;
+      margin-top: 0;
+      font-size: 1.5rem;
+      color: #0f1a2c;
       margin-bottom: 0.5rem;
-      color: #00e5ff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .card .value {
+    .value {
       font-size: 2rem;
-      font-weight: 600;
-      color: #ffffff;
+      color: #222;
+      font-weight: bold;
     }
 
     .card ul {
-      list-style: none;
-      padding: 0;
+      list-style: square;
+      padding-left: 1.5rem;
       margin: 0;
     }
 
     .card ul li {
-      margin-bottom: 0.4rem;
-      color: #c1c6d4;
-    }
-
-    @keyframes fadeInCard {
-      from {
-        opacity: 0;
-        transform: scale(0.97) translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      margin-bottom: 0.3rem;
+      color: #333;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
-  <div class="dashboard" id="dashboard">
-    <div class="card">
-      <h2>Total Full-Time Applications</h2>
-      <div class="value" id="total-applications">--</div>
-    </div>
-    <div class="card">
-      <h2>Average Response Time</h2>
-      <div class="value" id="avg-response">--</div>
-    </div>
-    <div class="card">
-      <h2>Upcoming Interviews</h2>
-      <ul id="interviews-list">
-        <li>--</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>Applications by Function</h2>
-      <ul id="function-breakdown">
-        <li>--</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>Applications by Industry</h2>
-      <ul id="industry-breakdown">
-        <li>--</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>Average Salary by Function</h2>
-      <ul id="salary-breakdown">
-        <li>--</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>Applications by Location</h2>
-      <ul id="location-breakdown">
-        <li>--</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2>Status Breakdown</h2>
-      <ul id="status-breakdown">
-        <li>--</li>
-      </ul>
-    </div>
+  <div class="dashboard">
+    <div class="card"><h2>📄 Total Applications</h2><div class="value" id="total-applications">--</div></div>
+    <div class="card"><h2>⏱️ Avg Response Time</h2><div class="value" id="avg-response">--</div></div>
+    <div class="card"><h2>🎤 Upcoming Interviews</h2><ul id="interviews-list"><li>--</li></ul></div>
+    <div class="card"><h2>📁 By Function</h2><ul id="function-breakdown"><li>--</li></ul></div>
+    <div class="card"><h2>🏭 By Industry</h2><ul id="industry-breakdown"><li>--</li></ul></div>
+    <div class="card"><h2>💰 Avg Salary by Function</h2><ul id="salary-breakdown"><li>--</li></ul></div>
+    <div class="card"><h2>📍 By Location</h2><ul id="location-breakdown"><li>--</li></ul></div>
+    <div class="card"><h2>📊 Status Breakdown</h2><ul id="status-breakdown"><li>--</li></ul></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
@@ -167,15 +127,14 @@
         const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
         document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const interviews = data.filter(row => {
           const dateStr = row['Interview Date'];
           if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
           const interviewDate = new Date(dateStr);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
           return interviewDate >= today;
         });
-
         const interviewList = document.getElementById('interviews-list');
         interviewList.innerHTML = interviews.length > 0
           ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
