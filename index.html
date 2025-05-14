@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Application Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -17,7 +17,6 @@
     h1 {
       text-align: center;
       margin-bottom: 2rem;
-      font-weight: 600;
       font-size: 2.5rem;
       color: #00bcd4;
     }
@@ -30,10 +29,20 @@
     }
 
     .dashboard {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Auto-fill with flexible column sizes */
-      gap: 1.5rem; /* Space between the boxes */
-      grid-auto-rows: minmax(100px, auto); /* Ensures the grid rows can adjust dynamically */
+      column-count: 3;
+      column-gap: 1.5rem;
+    }
+
+    @media (max-width: 1000px) {
+      .dashboard {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .dashboard {
+        column-count: 1;
+      }
     }
 
     .card {
@@ -41,13 +50,14 @@
       border: 1px solid #1f222b;
       border-radius: 16px;
       padding: 1.5rem;
+      margin-bottom: 1.5rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      break-inside: avoid;
       animation: fadeInCard 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .card h2 {
-      margin-top: 0;
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
@@ -81,52 +91,51 @@
         transform: scale(1) translateY(0);
       }
     }
-
   </style>
 </head>
 <body>
   <h1>Job Application Dashboard</h1>
   <div class="last-updated">Last updated: <span id="last-updated">--</span></div>
   <div class="dashboard" id="dashboard">
-    <div class="card blue">
+    <div class="card">
       <h2>Total Full-Time Applications</h2>
       <div class="value" id="total-applications">--</div>
     </div>
-    <div class="card teal">
+    <div class="card">
       <h2>Average Response Time</h2>
       <div class="value" id="avg-response">--</div>
     </div>
-    <div class="card green">
+    <div class="card">
       <h2>Upcoming Interviews</h2>
       <ul id="interviews-list">
         <li>--</li>
       </ul>
     </div>
-    <div class="card orange">
+    <div class="card">
       <h2>Applications by Function</h2>
       <ul id="function-breakdown">
         <li>--</li>
       </ul>
     </div>
-    <div class="card pink">
+    <div class="card">
       <h2>Applications by Industry</h2>
       <ul id="industry-breakdown">
         <li>--</li>
       </ul>
     </div>
-    <div class="card purple">
+    <div class="card">
       <h2>Average Salary by Function</h2>
       <ul id="salary-breakdown">
         <li>--</li>
       </ul>
     </div>
-    <div class="card teal">
+    <div class="card">
       <h2>Applications by Location</h2>
       <ul id="location-breakdown">
         <li>--</li>
       </ul>
     </div>
-    <div class="card green">
+    <div class="card">
       <h2>Status Breakdown</h2>
       <ul id="status-breakdown">
         <li>--</li>
@@ -136,7 +145,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    // Your existing code for parsing and populating data
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
 
     Papa.parse(sheetUrl, {
@@ -164,7 +172,7 @@
           if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
           const interviewDate = new Date(dateStr);
           const today = new Date();
-          today.setHours(0, 0, 0, 0); // normalize to midnight
+          today.setHours(0, 0, 0, 0);
           return interviewDate >= today;
         });
 
