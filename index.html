@@ -166,8 +166,20 @@
       header: true,
       complete: function(results) {
         const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
-        const now = new Date();
-        document.getElementById('last-updated').textContent = now.toLocaleString();
+      const sheetId = '1nC8DMkTufScBvOpK4r1Adw6NY54G320IB2Z_lgtSrSU';
+const apiKey = 'AIzaSyBevw7GcCJZuXQ-hjdgPtXnyUAtXYXnxGs';
+
+fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?fields=modifiedTime&key=${apiKey}`)
+  .then(response => response.json())
+  .then(data => {
+    const modTime = new Date(data.modifiedTime);
+    document.getElementById('last-updated').textContent = modTime.toLocaleString();
+  })
+  .catch(err => {
+    console.error('Could not get modified time:', err);
+    document.getElementById('last-updated').textContent = 'Unavailable';
+  });
+
 
         document.getElementById('total-applications').textContent = data.length;
 
