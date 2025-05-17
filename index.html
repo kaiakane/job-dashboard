@@ -183,15 +183,31 @@ fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?fields=modifiedTime&
 
         document.getElementById('total-applications').textContent = data.length;
 
-        const responseTimes = data
-          .map(row => {
-            const applied = new Date(row['Date Applied']);
-            const responded = new Date(row['Response Date']);
-            return (!isNaN(applied) && !isNaN(responded)) ? (responded - applied) / (1000 * 60 * 60 * 24) : null;
-          })
-          .filter(days => days !== null);
-        const avgResponse = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
-        document.getElementById('avg-response').textContent = avgResponse ? avgResponse.toFixed(1) + ' days' : '--';
+      const responseTimes = data
+  .map(row => {
+    const appliedStr = row['Date Applied'];
+    const respondedStr = row['Response Date'];
+
+    if (!appliedStr || !respondedStr || appliedStr.trim() === '-' || respondedStr.trim() === '-') {
+      return null;
+    }
+
+    const applied = new Date(appliedStr);
+    const responded = new Date(respondedStr);
+
+    return (!isNaN(applied) && !isNaN(responded) && responded > applied)
+      ? (responded - applied) / (1000 * 60 * 60 * 24)
+      : null;
+  })
+  .filter(days => days !== null);
+
+const avgResponse = responseTimes.length > 0
+  ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+  : null;
+
+document.getElementById('avg-response').textContent = avgResponse !== null
+  ? avgResponse.toFixed(1) + ' days'
+  : '--';
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
