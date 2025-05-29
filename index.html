@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -180,32 +181,58 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
- <script>
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
+  <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjpOFnfUrm3-Cq0QJLQ7cVqVnyX-y8_Nt0h1y18aZX9OyDPanWAXsLcwd1i_y7Fau58X-A_7GvT542/pub?output=csv';
 
-Papa.parse(sheetUrl, {
-  download: true,
-  header: true,
-  complete: function(results) {
-    const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data.filter(row => row['Company'] && row['Company'].trim() !== '');
+      const sheetId = '1nC8DMkTufScBvOpK4r1Adw6NY54G320IB2Z_lgtSrSU';
+const apiKey = 'AIzaSyBevw7GcCJZuXQ-hjdgPtXnyUAtXYXnxGs';
 
-    const sheetId = '1nC8DMkTufScBvOpK4r1Adw6NY54G320IB2Z_lgtSrSU';
-    const apiKey = 'AIzaSyBevw7GcCJZuXQ-hjdgPtXnyUAtXYXnxGs';
+fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?fields=modifiedTime&key=${apiKey}`)
+  .then(response => response.json())
+  .then(data => {
+    const modTime = new Date(data.modifiedTime);
+    document.getElementById('last-updated').textContent = modTime.toLocaleString();
+  })
+  .catch(err => {
+    console.error('Could not get modified time:', err);
+    document.getElementById('last-updated').textContent = 'Unavailable';
+  });
 
-    fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?fields=modifiedTime&key=${apiKey}`)
-      .then(response => response.json())
-      .then(data => {
-        const modTime = new Date(data.modifiedTime);
-        document.getElementById('last-updated').textContent = modTime.toLocaleString();
-      })
-      .catch(err => {
-        console.error('Could not get modified time:', err);
-        document.getElementById('last-updated').textContent = 'Unavailable';
-      });
 
-    document.getElementById('total-applications').textContent = data.length;
+        document.getElementById('total-applications').textContent = data.length;
 
-    const now = new Date();
+      const responseTimes = data
+  .map(row => {
+    const appliedStr = row['Date Applied'];
+    const respondedStr = row['Response Date'];
+
+    if (!appliedStr || !respondedStr || appliedStr.trim() === '-' || respondedStr.trim() === '-') {
+      return null;
+    }
+
+    const applied = new Date(appliedStr);
+    const responded = new Date(respondedStr);
+
+    return (!isNaN(applied) && !isNaN(responded) && responded > applied)
+      ? (responded - applied) / (1000 * 60 * 60 * 24)
+      : null;
+  })
+  .filter(days => days !== null);
+
+const avgResponse = responseTimes.length > 0
+  ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+  : null;
+
+document.getElementById('avg-response').textContent = avgResponse !== null
+  ? avgResponse.toFixed(1) + ' days'
+  : '--';
+
+        const now = new Date();
     const interviewColumns = [
       ['Interview #1 Date', 'Interview #1 Time', 'Interview #1 Type'],
       ['Interview #2 Date', 'Interview #2 Time', 'Interview #2 Type'],
@@ -263,8 +290,70 @@ Papa.parse(sheetUrl, {
       interviewList.innerHTML = '<div>None</div>';
     }
   }
-});
-</script>
 
+
+        renderList(countBy(data, 'Function'), 'function-breakdown');
+        renderList(countBy(data, 'Industry'), 'industry-breakdown');
+        renderList(countBy(data, 'Location'), 'location-breakdown');
+
+        const salaryMap = {};
+        data.forEach(row => {
+          const func = (row['Function'] || '').trim();
+          const sal = parseSalary(row['Salary']);
+          if (func && func !== '-' && sal) {
+            if (!salaryMap[func]) salaryMap[func] = [];
+            salaryMap[func].push(sal);
+          }
+        });
+        const salaryList = document.getElementById('salary-breakdown');
+      salaryList.innerHTML = Object.entries(salaryMap).length > 0
+  ? Object.entries(salaryMap)
+      .map(([func, sals]) => {
+        const avg = sals.reduce((a, b) => a + b, 0) / sals.length;
+        return { func, avg };
+      })
+      .sort((a, b) => b.avg - a.avg)
+      .map(({ func, avg }) => `<li>${func}: $${Math.round(avg).toLocaleString()}</li>`)
+      .join('')
+  : '<li>--</li>';
+
+        const statusCounts = countBy(data, 'Status');
+        const total = data.length;
+        const statusList = document.getElementById('status-breakdown');
+        statusList.innerHTML = Object.entries(statusCounts).length > 0
+          ? Object.entries(statusCounts)
+              .map(([status, count]) => `<li>${status}: ${count} (${Math.round((count/total)*100)}%)</li>`)
+              .join('')
+          : '<li>--</li>';
+      }
+    });
+
+    function countBy(data, key) {
+      return data.reduce((acc, row) => {
+        const val = (row[key] || '').toString().trim();
+        if (val && val !== '-') {
+          acc[val] = (acc[val] || 0) + 1;
+        }
+        return acc;
+      }, {});
+    }
+
+    function parseSalary(salary) {
+      if (!salary || typeof salary !== 'string') return null;
+      const cleaned = salary.replace(/[$,]/g, '').split('-').map(s => parseFloat(s.trim()));
+      if (cleaned.length === 2 && !isNaN(cleaned[0]) && !isNaN(cleaned[1])) {
+        return (cleaned[0] + cleaned[1]) / 2;
+      }
+      return null;
+    }
+
+    function renderList(obj, elementId) {
+  const el = document.getElementById(elementId);
+  el.innerHTML = Object.entries(obj)
+    .sort((a, b) => b[1] - a[1]) // Sort descending by count/value
+    .map(([key, value]) => `<li>${key}: ${value}</li>`)
+    .join('');
+}
+  </script>
 </body>
 </html>
