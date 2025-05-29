@@ -245,11 +245,17 @@ if (interviews.length > 0) {
   const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
   const rowsHtml = interviews.map(i => {
     const dateObj = new Date(i['Interview Date']);
-    const formattedDate = dateObj.toLocaleDateString('default', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    const day = dateObj.getDate();
+const suffix = (d => {
+  if (d > 3 && d < 21) return 'th';
+  switch (d % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+})(day);
+const formattedDate = `${dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
 
     return `
       <div>${formattedDate}</div>
