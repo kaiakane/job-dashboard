@@ -232,64 +232,44 @@ document.getElementById('avg-response').textContent = avgResponse !== null
   ? avgResponse.toFixed(1) + ' days'
   : '--';
 
-        const now = new Date();
-    const interviewColumns = [
-      ['Interview #1 Date', 'Interview #1 Time', 'Interview #1 Type'],
-      ['Interview #2 Date', 'Interview #2 Time', 'Interview #2 Type'],
-      ['Interview #3 Date', 'Interview #3 Time', 'Interview #3 Type']
-    ];
-
-    const interviews = [];
-    data.forEach(row => {
-      interviewColumns.forEach(([dateCol, timeCol, typeCol], index) => {
-        const dateStr = row[dateCol];
-        const timeStr = row[timeCol];
-        if (!dateStr || !timeStr || dateStr.trim() === '-' || timeStr.trim() === '-') return;
-
-        const interviewDateTime = new Date(`${dateStr} ${timeStr}`);
-        if (interviewDateTime >= now) {
-          interviews.push({
-            datetime: interviewDateTime,
-            company: row['Company'] || '--',
-            jobTitle: row['Job Title'] || '--',
-            type: row[typeCol] || '--'
-          });
-        }
-      });
-    });
-
-    interviews.sort((a, b) => a.datetime - b.datetime);
-    const interviewList = document.getElementById('interviews-list');
-
-    if (interviews.length > 0) {
-      const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
-      const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
-      const rowsHtml = interviews.map(i => {
-        const day = i.datetime.getDate();
-        const suffix = (d => {
-          if (d > 3 && d < 21) return 'th';
-          switch (d % 10) {
-            case 1: return 'st';
-            case 2: return 'nd';
-            case 3: return 'rd';
-            default: return 'th';
-          }
-        })(day);
-        const formattedDate = `${i.datetime.toLocaleString('default', { month: 'short' })} ${day}${suffix}, ${i.datetime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-
-        return `
-          <div>${formattedDate}</div>
-          <div>${i.company}</div>
-          <div>${i.jobTitle}</div>
-          <div>${i.type}</div>
-        `;
-      }).join('');
-
-      interviewList.innerHTML = headerHtml + rowsHtml;
-    } else {
-      interviewList.innerHTML = '<div>None</div>';
-    }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const interviews = data.filter(row => {
+          const dateStr = row['Interview Date'];
+          if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
+          const interviewDate = new Date(dateStr);
+          return interviewDate >= today;
+        });
+        const interviewList = document.getElementById('interviews-list');
+if (interviews.length > 0) {
+  const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
+  const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
+  const rowsHtml = interviews.map(i => {
+    const dateObj = new Date(i['Interview Date']);
+    const day = dateObj.getDate();
+const suffix = (d => {
+  if (d > 3 && d < 21) return 'th';
+  switch (d % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
   }
+})(day);
+const formattedDate = `${dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
+
+    return `
+      <div>${formattedDate}</div>
+      <div>${i['Company'] || '--'}</div>
+      <div>${i['Job Title'] || '--'}</div>
+      <div>${i['Interview Type'] || '--'}</div>
+    `;
+  }).join('');
+
+  interviewList.innerHTML = headerHtml + rowsHtml;
+} else {
+  interviewList.innerHTML = '<div>None</div>';
+}
 
 
         renderList(countBy(data, 'Function'), 'function-breakdown');
