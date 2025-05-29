@@ -232,37 +232,68 @@ document.getElementById('avg-response').textContent = avgResponse !== null
   ? avgResponse.toFixed(1) + ' days'
   : '--';
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const interviews = data.filter(row => {
-          const dateStr = row['Interview Date'];
-          if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return false;
-          const interviewDate = new Date(dateStr);
-          return interviewDate >= today;
-        });
-        const interviewList = document.getElementById('interviews-list');
-if (interviews.length > 0) {
+       const now = new Date();
+
+const upcomingInterviews = [];
+
+// Loop through each row and for each of the 3 interviews
+data.forEach(row => {
+  for (let i = 1; i <= 3; i++) {
+    const dateStr = row[`Interview #${i} Date`];
+    const timeStr = row[`Interview #${i} Time`];
+    const typeStr = row[`Interview #${i} Type`];
+
+    if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') continue;
+
+    // Combine date and time to create a full datetime string
+    // If time is missing or invalid, default to 00:00 (start of day)
+    let datetimeStr = dateStr.trim();
+    if (timeStr && timeStr.trim() !== '-' && timeStr.trim() !== '') {
+      datetimeStr += ' ' + timeStr.trim();
+    } else {
+      datetimeStr += ' 00:00';
+    }
+
+    const interviewDateTime = new Date(datetimeStr);
+
+    if (!isNaN(interviewDateTime) && interviewDateTime >= now) {
+      upcomingInterviews.push({
+        dateObj: interviewDateTime,
+        company: row['Company'] || '--',
+        jobTitle: row['Job Title'] || '--',
+        interviewType: typeStr || '--'
+      });
+    }
+  }
+});
+
+const interviewList = document.getElementById('interviews-list');
+
+if (upcomingInterviews.length > 0) {
+  // Sort by datetime ascending
+  upcomingInterviews.sort((a, b) => a.dateObj - b.dateObj);
+
   const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
   const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
-  const rowsHtml = interviews.map(i => {
-    const dateObj = new Date(i['Interview Date']);
-    const day = dateObj.getDate();
-const suffix = (d => {
-  if (d > 3 && d < 21) return 'th';
-  switch (d % 10) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
-  }
-})(day);
-const formattedDate = `${dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
+
+  const rowsHtml = upcomingInterviews.map(i => {
+    const day = i.dateObj.getDate();
+    const suffix = (d => {
+      if (d > 3 && d < 21) return 'th';
+      switch (d % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    })(day);
+    const formattedDate = `${i.dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
 
     return `
       <div>${formattedDate}</div>
-      <div>${i['Company'] || '--'}</div>
-      <div>${i['Job Title'] || '--'}</div>
-      <div>${i['Interview Type'] || '--'}</div>
+      <div>${i.company}</div>
+      <div>${i.jobTitle}</div>
+      <div>${i.interviewType}</div>
     `;
   }).join('');
 
@@ -270,6 +301,7 @@ const formattedDate = `${dateObj.toLocaleString('default', { month: 'short' })} 
 } else {
   interviewList.innerHTML = '<div>None</div>';
 }
+
 
 
         renderList(countBy(data, 'Function'), 'function-breakdown');
