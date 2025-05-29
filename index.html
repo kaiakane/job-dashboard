@@ -219,7 +219,23 @@ document.getElementById('avg-response').textContent = avgResponse !== null
         });
         const interviewList = document.getElementById('interviews-list');
         interviewList.innerHTML = interviews.length > 0
-          ? interviews.map(i => `<li>${i['Company']} – ${i['Job Title']} – ${i['Interview Date']}</li>`).join('')
+          ? interviews.map(i => {
+    const dateObj = new Date(i['Interview Date']);
+    const month = dateObj.toLocaleString('default', { month: 'short' });
+    const day = dateObj.getDate();
+    const suffix = (d => {
+      if (d > 3 && d < 21) return 'th';
+      switch (d % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    })(day);
+    const formattedDate = `${month} ${day}${suffix}`;
+    return `<li>${i['Company']} – ${i['Job Title']} – ${formattedDate}</li>`;
+  }).join('')
+
           : '<li>None</li>';
 
         renderList(countBy(data, 'Function'), 'function-breakdown');
