@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -273,7 +274,7 @@ if (upcomingInterviews.length > 0) {
   // Sort by datetime ascending
   upcomingInterviews.sort((a, b) => a.dateObj - b.dateObj);
 
-  const headers = ['Date', 'Time', 'Company', 'Job Title', 'Interview Type'];
+  const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
   const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
 
   const rowsHtml = upcomingInterviews.map(i => {
@@ -289,20 +290,13 @@ if (upcomingInterviews.length > 0) {
     })(day);
     const formattedDate = `${i.dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
 
-    // Use time if available, otherwise show '--'
-    const timeStr = i.interviewTime && i.interviewTime.trim() !== '' && i.interviewTime.trim() !== '-' 
-      ? i.interviewTime.trim() 
-      : '--';
-
     return `
       <div>${formattedDate}</div>
-      <div>${timeStr}</div>
       <div>${i.company}</div>
       <div>${i.jobTitle}</div>
       <div>${i.interviewType}</div>
     `;
   }).join('');
-
 
   interviewList.innerHTML = headerHtml + rowsHtml;
 } else {
