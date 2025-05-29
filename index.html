@@ -131,7 +131,20 @@
     text-align: center;
   }
 }
+.interview-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 2fr; /* Adjust as needed */
+  gap: 0.5rem 1rem;
+  align-items: center;
+  font-size: 1.1rem;
+}
 
+.interview-grid .header {
+  font-weight: bold;
+  color: #222288;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.3rem;
+}
 
   </style>
 </head>
@@ -149,7 +162,16 @@
   <div class="dashboard">
     <div class="card"><div class="card-header"><span>Total Full-Time Applications</span><span class="close-button"></span></div><div class="card-content"><div id="total-applications">--</div></div></div>
     <div class="card"><div class="card-header"><span>Average Response Time</span><span class="close-button"></span></div><div class="card-content"><div id="avg-response">--</div></div></div>
-    <div class="card"><div class="card-header"><span>Upcoming Interviews</span><span class="close-button"></span></div><div class="card-content"><ul id="interviews-list"><li>--</li></ul></div></div>
+    <div class="card">
+  <div class="card-header">
+    <span>Upcoming Interviews</span>
+    <span class="close-button"></span>
+  </div>
+  <div class="card-content">
+    <div id="interviews-list" class="interview-grid"></div>
+  </div>
+</div>
+
     <div class="card"><div class="card-header"><span>Applications by Function</span><span class="close-button"></span></div><div class="card-content"><ul id="function-breakdown"><li>--</li></ul></div></div>
     <div class="card"><div class="card-header"><span>Applications by Industry</span><span class="close-button"></span></div><div class="card-content"><ul id="industry-breakdown"><li>--</li></ul></div></div>
     <div class="card"><div class="card-header"><span>Average Salary by Function</span><span class="close-button"></span></div><div class="card-content"><ul id="salary-breakdown"><li>--</li></ul></div></div>
@@ -218,25 +240,30 @@ document.getElementById('avg-response').textContent = avgResponse !== null
           return interviewDate >= today;
         });
         const interviewList = document.getElementById('interviews-list');
-        interviewList.innerHTML = interviews.length > 0
-          ? interviews.map(i => {
+if (interviews.length > 0) {
+  const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
+  const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
+  const rowsHtml = interviews.map(i => {
     const dateObj = new Date(i['Interview Date']);
-    const month = dateObj.toLocaleString('default', { month: 'short' });
-    const day = dateObj.getDate();
-    const suffix = (d => {
-      if (d > 3 && d < 21) return 'th';
-      switch (d % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
-      }
-    })(day);
-    const formattedDate = `${month} ${day}${suffix}`;
-    return `<li>${i['Company']} – ${i['Job Title']} – ${formattedDate}</li>`;
-  }).join('')
+    const formattedDate = dateObj.toLocaleDateString('default', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
 
-          : '<li>None</li>';
+    return `
+      <div>${formattedDate}</div>
+      <div>${i['Company'] || '--'}</div>
+      <div>${i['Job Title'] || '--'}</div>
+      <div>${i['Interview Type'] || '--'}</div>
+    `;
+  }).join('');
+
+  interviewList.innerHTML = headerHtml + rowsHtml;
+} else {
+  interviewList.innerHTML = '<div>None</div>';
+}
+
 
         renderList(countBy(data, 'Function'), 'function-breakdown');
         renderList(countBy(data, 'Industry'), 'industry-breakdown');
