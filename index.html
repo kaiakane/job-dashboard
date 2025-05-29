@@ -173,6 +173,15 @@
     <div id="interviews-list" class="interview-grid"></div>
   </div>
 </div>
+<div class="card">
+  <div class="card-header">
+    <span>Past Interviews (last 60 days)</span>
+    <span class="close-button"></span>
+  </div>
+  <div class="card-content">
+    <div id="past-interviews-list" class="interview-grid"></div>
+  </div>
+</div>
 
     <div class="card"><div class="card-header"><span>Applications by Function</span><span class="close-button"></span></div><div class="card-content"><ul id="function-breakdown"><li>--</li></ul></div></div>
     <div class="card"><div class="card-header"><span>Applications by Industry</span><span class="close-button"></span></div><div class="card-content"><ul id="industry-breakdown"><li>--</li></ul></div></div>
@@ -301,6 +310,104 @@ if (upcomingInterviews.length > 0) {
   interviewList.innerHTML = headerHtml + rowsHtml;
 } else {
   interviewList.innerHTML = '<div>None</div>';
+}
+// PAST INTERVIEWS (last 60 days), grouped by job title
+
+const pastInterviews = [];
+
+// Get date 60 days ago
+const sixtyDaysAgo = new Date(now);
+sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+// Helper function to parse interview datetime
+function parseInterviewDate(row, i) {
+  const dateStr = row[`Interview #${i} Date`];
+  const timeStr = row[`Interview #${i} Time`];
+  if (!dateStr || dateStr.trim() === '-' || dateStr.trim() === '') return null;
+
+  let datetimeStr = dateStr.trim();
+  if (timeStr && timeStr.trim() !== '-' && timeStr.trim() !== '') {
+    datetimeStr += ' ' + timeStr.trim();
+  } else {
+    datetimeStr += ' 00:00';
+  }
+
+  const dt = new Date(datetimeStr);
+  return isNaN(dt) ? null : dt;
+}
+
+// Collect all past interviews within last 60 days
+data.forEach(row => {
+  for (let i = 1; i <= 3; i++) {
+    const interviewDateTime = parseInterviewDate(row, i);
+    if (
+      interviewDateTime &&
+      interviewDateTime < now &&
+      interviewDateTime >= sixtyDaysAgo
+    ) {
+      pastInterviews.push({
+        dateObj: interviewDateTime,
+        company: row['Company'] || '--',
+        jobTitle: row['Job Title'] || '--',
+        interviewResult: row[`Interview #${i} Result`] || '--',
+      });
+    }
+  }
+});
+
+// Group interviews by job title (with company)
+const grouped = {};
+pastInterviews.forEach(interview => {
+  const key = interview.jobTitle + ' @ ' + interview.company;
+  if (!grouped[key]) grouped[key] = [];
+  grouped[key].push(interview);
+});
+
+// Sort groups by most recent interview date descending
+const sortedGroups = Object.entries(grouped)
+  .map(([key, interviews]) => {
+    interviews.sort((a, b) => b.dateObj - a.dateObj);
+    return { key, interviews };
+  })
+  .sort((a, b) => b.interviews[0].dateObj - a.interviews[0].dateObj);
+
+// Render past interviews
+const pastInterviewList = document.getElementById('past-interviews-list');
+
+if (pastInterviews.length > 0) {
+  // Header row
+  const headers = ['Date', 'Company', 'Job Title', 'Interview Result'];
+  const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
+
+  // Rows grouped by jobTitle + company
+  let rowsHtml = '';
+  sortedGroups.forEach(group => {
+    group.interviews.forEach((interview, idx) => {
+      // Format date
+      const day = interview.dateObj.getDate();
+      const suffix = (d => {
+        if (d > 3 && d < 21) return 'th';
+        switch (d % 10) {
+          case 1: return 'st';
+          case 2: return 'nd';
+          case 3: return 'rd';
+          default: return 'th';
+        }
+      })(day);
+      const formattedDate = `${interview.dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
+
+      rowsHtml += `
+        <div>${formattedDate}</div>
+        <div>${interview.company}</div>
+        <div>${interview.jobTitle}</div>
+        <div>${interview.interviewResult}</div>
+      `;
+    });
+  });
+
+  pastInterviewList.innerHTML = headerHtml + rowsHtml;
+} else {
+  pastInterviewList.innerHTML = '<div>None</div>';
 }
 
 
