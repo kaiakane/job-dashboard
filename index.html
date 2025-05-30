@@ -316,7 +316,8 @@ if (upcomingInterviews.length > 0) {
 
   interviewList.innerHTML = headerHtml + rowsHtml;
 } else {
-  interviewList.innerHTML = '<div>None</div>';
+  interviewList.innerHTML = '<div style="grid-column: 1 / -1;">None</div>';
+
 }
 // PAST INTERVIEWS (last 60 days), grouped by job title
 
