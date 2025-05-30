@@ -147,6 +147,17 @@
   border-bottom: 2px solid #000;
   padding-bottom: 0.3rem;
 }
+@media (max-width: 600px) {
+  .interview-grid {
+    grid-template-columns: 1fr 2fr; /* 2 columns instead of 4 */
+    grid-auto-rows: auto;
+    font-size: 1rem;
+  }
+  .interview-grid > div:nth-child(4n+3),
+  .interview-grid > div:nth-child(4n+4) {
+    grid-column: span 2;
+  }
+}
 
   </style>
 </head>
