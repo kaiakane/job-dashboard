@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -316,8 +317,7 @@ if (upcomingInterviews.length > 0) {
 
   interviewList.innerHTML = headerHtml + rowsHtml;
 } else {
-  interviewList.innerHTML = '<div style="grid-column: 1 / -1;">None</div>';
-
+  interviewList.innerHTML = '<div>None</div>';
 }
 // PAST INTERVIEWS (last 60 days), grouped by job title
 
@@ -353,50 +353,11 @@ data.forEach(row => {
       interviewDateTime < now &&
       interviewDateTime >= sixtyDaysAgo
     ) {
-           pastInterviews.push({
+      pastInterviews.push({
         dateObj: interviewDateTime,
         company: row['Company'] || '--',
         jobTitle: row['Job Title'] || '--',
-        interviewType: row[`Interview #${i} Type`] || '--'
-      });
-    }
-  }
-});
-
-const pastList = document.getElementById('past-interviews-list');
-
-if (pastInterviews.length > 0) {
-  pastInterviews.sort((a, b) => b.dateObj - a.dateObj); // Most recent first
-
-  const headers = ['Date', 'Company', 'Job Title', 'Interview Type'];
-  const headerHtml = headers.map(h => `<div class="header">${h}</div>`).join('');
-
-  const rowsHtml = pastInterviews.map(i => {
-    const day = i.dateObj.getDate();
-    const suffix = (d => {
-      if (d > 3 && d < 21) return 'th';
-      switch (d % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
-      }
-    })(day);
-    const formattedDate = `${i.dateObj.toLocaleString('default', { month: 'short' })} ${day}${suffix}`;
-
-    return `
-      <div>${formattedDate}</div>
-      <div>${i.company}</div>
-      <div>${i.jobTitle}</div>
-      <div>${i.interviewType}</div>
-    `;
-  }).join('');
-
-  pastList.innerHTML = headerHtml + rowsHtml;
-} else {
-  pastList.innerHTML = '<div style="grid-column: 1 / -1;">None in the last 60 days</div>';
-}
-
+        interviewResult: row[`Interview #${i} Result`] || '--',
       });
     }
   }
