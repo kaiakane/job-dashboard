@@ -323,9 +323,9 @@ if (upcomingInterviews.length > 0) {
 
 const pastInterviews = [];
 
-// Get date 60 days ago
-const sixtyDaysAgo = new Date(now);
-sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+// Get date 90 days ago
+const ninetyDaysAgo = new Date(now);
+ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
 // Helper function to parse interview datetime
 function parseInterviewDate(row, i) {
@@ -351,7 +351,7 @@ data.forEach(row => {
     if (
       interviewDateTime &&
       interviewDateTime < now &&
-      interviewDateTime >= sixtyDaysAgo
+      interviewDateTime >= ninetyDaysAgo
     ) {
       pastInterviews.push({
         dateObj: interviewDateTime,
